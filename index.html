@@ -3,6 +3,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -542,7 +543,14 @@
     return { header, entries };
   }
 
+  let isSubmitted = false;
+
   async function handleSubmit() {
+    if (isSubmitted) {
+      alert('⚠️ DATA ALREADY SUBMITTED');
+      return;
+    }
+
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = '⏳ Submitting...';
@@ -557,10 +565,13 @@
         body: JSON.stringify(payload),
       });
       // no-cors returns opaque response, assume success if no network error
+      isSubmitted = true;
+      btn.textContent = '✅ Submitted';
+      btn.style.background = 'linear-gradient(135deg,#7f8c8d,#95a5a6)';
+      btn.title = 'Data already submitted';
       showToast('✅ Data submitted to Google Sheet!', 'success');
     } catch (err) {
       showToast('❌ Failed to connect. Check the Web App URL.', 'error');
-    } finally {
       btn.disabled = false;
       btn.textContent = '✔ Submit to Google Sheet';
     }
