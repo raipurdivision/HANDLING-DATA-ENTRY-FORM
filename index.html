@@ -1,0 +1,850 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RRB ALP Handling Report - South East Central Railway</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      background:linear-gradient(135deg,#b1d5e6 0%,#87ceeb 100%);
+      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      padding:16px; min-height:100vh;
+    }
+    .container{
+      max-width:1032px; margin:0 auto;
+      background:rgb(138,201,241);
+      border-radius:15px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.2);
+      overflow:hidden;
+    }
+    .header{
+      background:linear-gradient(135deg,#1a237e 0%,#283593 100%);
+      color:#fff; border-bottom:4px solid #FFD700;
+      padding:12px 18px;
+    }
+    .header-inner{display:flex;align-items:center;gap:14px;}
+    .logo-circle{
+      width:64px;height:64px;border-radius:50%;
+      border:3px solid #FFD700;background:rgba(255,255,255,0.1);
+      display:flex;align-items:center;justify-content:center;
+      font-size:9px;color:#FFD700;text-align:center;padding:6px;font-weight:bold;
+      flex-shrink:0;
+    }
+    .header-text{text-align:center;flex:1;}
+    .header-text .hindi{font-size:1.4em;font-weight:bold;letter-spacing:1px;text-shadow:1px 1px 3px rgba(0,0,0,.3);}
+    .header-text .sub{font-size:0.82em;color:#FFD700;font-weight:bold;letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
+    .header-text .sub2{font-size:0.75em;color:#FFD700;opacity:.85;letter-spacing:.5px;}
+    .header-meta{font-size:11px;color:#FFD700;line-height:1.8;text-align:right;flex-shrink:0;}
+    .form-container{padding:18px;background:#e4e7e7;}
+    .section{
+      background:rgb(212,220,218);padding:15px;margin-bottom:16px;
+      border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,.1);
+    }
+    .section-title{
+      font-size:0.95em;font-weight:bold;
+      background:linear-gradient(135deg,#1a237e,#3949ab);
+      color:#fff;padding:7px 12px;border-radius:5px;
+      letter-spacing:1px;margin-bottom:14px;text-transform:uppercase;text-align:center;
+    }
+    .fields-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 20px;}
+    .fields-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+    .field-pair{display:grid;grid-template-columns:140px 1fr;align-items:center;gap:0 10px;}
+    .field-pair label{font-size:12px;font-weight:bold;color:#1a237e;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+    input[type="text"],input[type="date"],input[type="time"],input[type="number"],select,textarea{
+      width:100%;padding:7px 9px;border:2px solid #b3d9ff;border-radius:5px;
+      font-size:12px;font-weight:bold;background:#fff;
+      transition:border-color .3s,box-shadow .3s;color:#1a237e;height:34px;
+    }
+    textarea{height:auto;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#4a90e2;box-shadow:0 0 8px rgba(74,144,226,.3);}
+    input[type="text"],textarea{text-transform:uppercase;}
+    #entriesWrap{display:flex;flex-direction:column;gap:14px;}
+    .entry-card{background:#fff;border:2px solid #b3d9ff;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,.08);overflow:hidden;}
+    .entry-card-head{
+      background:linear-gradient(135deg,#1a237e 0%,#4a8ec2 100%);color:#fff;
+      padding:7px 12px;display:flex;align-items:center;justify-content:space-between;
+    }
+    .entry-card-head .entry-num{font-size:12px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;}
+    .entry-card-body{padding:14px;background:#f0f8ff;}
+    .entry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 20px;}
+    .entry-field{display:grid;grid-template-columns:140px 1fr;align-items:center;gap:0 10px;}
+    .entry-field label{font-size:11px;font-weight:bold;color:#1a237e;text-transform:uppercase;letter-spacing:.3px;}
+    .entry-field.full{grid-column:1/-1;grid-template-columns:140px 1fr;align-items:start;}
+    .entry-field.full label{padding-top:7px;}
+    .entry-field textarea{resize:vertical;min-height:42px;height:auto;}
+    .btn-row{display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;}
+    .btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;transition:all .3s;text-transform:uppercase;letter-spacing:.5px;}
+    .btn-green{background:linear-gradient(135deg,#27ae60,#229954);color:#fff;}
+    .btn-green:hover{background:linear-gradient(135deg,#229954,#1e8449);transform:translateY(-1px);}
+    .btn-green:disabled{background:#aaa;cursor:not-allowed;transform:none;}
+    .btn-blue{background:linear-gradient(135deg,#1a237e,#3949ab);color:#fff;}
+    .btn-blue:hover{background:linear-gradient(135deg,#283593,#1a237e);transform:translateY(-1px);}
+    .btn-blue:disabled{background:#aaa;cursor:not-allowed;transform:none;}
+    .btn-red{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;}
+    .btn-red:hover{background:linear-gradient(135deg,#a93226,#c0392b);transform:translateY(-1px);}
+    .delete-btn{background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.3px;}
+    .delete-btn:hover{background:#c0392b;}
+    #toast{
+      display:none;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+      padding:12px 28px;border-radius:8px;font-size:14px;font-weight:bold;
+      color:#fff;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.3);
+      animation:fadeIn .3s ease;
+    }
+    #toast.success{background:#27ae60;}
+    #toast.error{background:#e74c3c;}
+    #toast.info{background:#1a237e;}
+    @keyframes fadeIn{from{opacity:0;bottom:15px;}to{opacity:1;bottom:30px;}}
+    @media (max-width:700px){
+      .fields-grid,.fields-grid.cols-3{grid-template-columns:1fr;}
+      .field-pair{grid-template-columns:110px 1fr;}
+      .entry-grid{grid-template-columns:1fr;}
+      .entry-field,.entry-field.full{grid-template-columns:110px 1fr;}
+    }
+    input[type="text"][readonly]{
+      background: linear-gradient(135deg,#e8f5e9,#f1f8e9);
+      color:#1a237e;
+      cursor:not-allowed;
+      border-color:#66bb6a;
+      font-style:italic;
+    }
+    input[type="text"][readonly]::after{content:" ✓";}
+    .auto-filled-label::after{content:" ✓";color:#27ae60;font-size:10px;}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-inner">
+   
+      <div class="header-text">
+        <div class="hindi">LR / HANDLING DATA FORM</div>
+        <div class="sub">South East Central Railway</div>
+        <div class="sub2">Raipur Division</div>
+      </div>
+      <div class=""></div>
+    </div>
+  </div>
+
+  <div class="form-container">
+
+    <!-- Trainee Details -->
+    <div class="section">
+      <div class="section-title">Trainee Details</div>
+      <div class="fields-grid">
+        <div class="field-pair" style="grid-column:1/-1;">
+          <label>Name of Trainee</label>
+          <div style="display:flex;gap:7px;align-items:center;">
+            <select id="traineeName" onchange="autoFillTrainee(this.value)" style="flex:1;">
+              <option value="">⏳ Loading...</option>
+            </select>
+            <button class="btn btn-blue" onclick="loadTrainees()" title="Refresh trainee list from Google Sheet" style="padding:5px 10px;white-space:nowrap;font-size:11px;height:34px;">&#x1F504; Refresh</button>
+          </div>
+        </div>
+        <div class="field-pair">
+          <label>Designation</label>
+          <input type="text" id="designation">
+        </div>
+        <div class="field-pair">
+          <label>HQ</label>
+          <input type="text" id="hq">
+        </div>
+        <div class="field-pair">
+          <label>HRMS ID</label>
+          <input type="text" id="hrms">
+        </div>
+        <div class="field-pair">
+          <label>Nominated CLI</label>
+          <select id="nominatedcli">
+            <option value="">-- Select CLI --</option>
+            <option value="A K REDDY/CLI/BIA">A K REDDY/CLI/BIA</option>
+            <option value="A.R.TARAM/CLI/BIA">A.R. TARAM/CLI/BIA</option>
+            <option value="ABDUL MOIN KHAN/CLI/BIA">ABDUL MOIN KHAN/CLI/BIA</option>
+            <option value="AKHILESH KUMAR/CLI/BIA">AKHILESH KUMAR/CLI/BIA</option>
+            <option value="AMIT KUMAR BANKURE/CLI/BYT">AMIT KUMAR BANKURE/CLI/BYT</option>
+            <option value="ANANT PRAKASH SHRIVASTAVA/CLI/BIA">ANANT PRAKASH SHRIVASTAVA/CLI/BIA</option>
+            <option value="ANIL KUMAR/CLI/BIA">ANIL KUMAR/CLI/BIA</option>
+            <option value="ANKIT RAM KANT/CLI/BIA">ANKIT RAM KANT/CLI/BIA</option>
+            <option value="AVON KUMAR SAHU/CLI/R">AVON KUMAR SAHU/CLI/R</option>
+            <option value="ASHISH WANJARI/CLI/BYT">ASHISH WANJARI/CLI/BYT</option>
+            <option value="B B KUSHWAHA/CLI/BIA">B B KUSHWAHA/CLI/BIA</option>
+            <option value="B K HARMUKH/CLI/BIA">B K HARMUKH/CLI/BIA</option>
+            <option value="B. K. SAHA/CLI/BIA">B. K. SAHA/CLI/BIA</option>
+            <option value="B.K.SONI/CLI/BIA">B.K.SONI/CLI/BIA</option>
+            <option value="BHARAT SINGH ATBHAIYYA/CLI/R">BHARAT SINGH ATBHAIYYA/CLI/R</option>
+            <option value="BHOLI CHAUDHARY/CLI/R">BHOLI CHAUDHARY/CLI/R</option>
+            <option value="BIKRAMJIT KANRAR/CLI/BIA">BIKRAMJIT KANRAR/CLI/BIA</option>
+            <option value="BINOD KUMAR RAM/CLI/R">BINOD KUMAR RAM/CLI/R</option>
+            <option value="CLI NAME/CLI/BIA">CLI NAME/CLI/BIA</option>
+            <option value="DEEPANNITA PUNTAMBEKAR/CLI/BIA">DEEPANNITA PUNTAMBEKAR/CLI/BIA</option>
+            <option value="DILLI RAO/CLI/BYT">DILLI RAO/CLI/BYT</option>
+            <option value="G. C. BISWAS/CLI/R">G. C. BISWAS/CLI/R</option>
+            <option value="G. V. R. K. MADHU/CLI/BIA">G. V. R. K. MADHU/CLI/BIA</option>
+            <option value="GIRDHARI LAL/CLI/R">GIRDHARI LAL/CLI/R</option>
+            <option value="JAISHANKAR SHARMA/CLI/BIA">JAISHANKAR SHARMA/CLI/BIA</option>
+            <option value="JITENDRA KUMAR MISHRA/CLI/BYT">JITENDRA KUMAR MISHRA/CLI/BYT</option>
+            <option value="K P LAHARE/CLI/R">K P LAHARE/CLI/R</option>
+            <option value="K P HIRWANI/CLI/BYT">K P HIRWANI/CLI/BYT</option>
+            <option value="K. K. SAHU/CLI/BIA">K. K. SAHU/CLI/BIA</option>
+            <option value="KHUSHAL SINGH/CLI/DRZ">KHUSHAL SINGH/CLI/DRZ</option>
+            <option value="KAMLESH KUMAR RAJABHOJ/CLI/BIA">KAMLESH KUMAR RAJABHOJ/CLI/BIA</option>
+            <option value="MAHESHWAR/CLI/BIA">MAHESHWAR/CLI/BIA</option>
+            <option value="MANOJ KUMAR SAO/CLI/R">MANOJ KUMAR SAO/CLI/R</option>
+            <option value="MANSUKH LAL CHANDRAKAR/CLI/R">MANSUKH LAL CHANDRAKAR/CLI/R</option>
+            <option value="MOHIT KUMAR SWARNKAR/CLI/BIA">MOHIT KUMAR SWARNKAR/CLI/BIA</option>
+            <option value="N. R. KARPAL/CLI/BIA">N. R. KARPAL/CLI/BIA</option>
+            <option value="N.K. BHOI/CLI/R">N.K. BHOI/CLI/R</option>
+            <option value="NITIN KUKDE/CLI/BYT">NITIN KUKDE/CLI/BYT</option>
+            <option value="NIRMAL KUMAR/CLI/BYT">NIRMAL KUMAR/CLI/BYT</option>
+            <option value="P.K. PATEL/CLI/BIA">P.K. PATEL/CLI/BIA</option>
+            <option value="PANKAJ KUMAR SINGH/CLI/BIA">PANKAJ KUMAR SINGH/CLI/BIA</option>
+            <option value="PAWAN KUMAR SINGH/CLI/BIA">PAWAN KUMAR SINGH/CLI/BIA</option>
+            <option value="PURAN LAL PATEL/CLI/BYT">PURAN LAL PATEL/CLI/BYT</option>
+            <option value="RAJENDRA KUMAR/CLI/BIA">RAJENDRA KUMAR/CLI/BIA</option>
+            <option value="PALAK RAM ALENDRA/CLI/DRZ">PALAK RAM ALENDRA/CLI/DRZ</option>
+            <option value="RAJESH KUMAR DESHMUKH/CLI/R">RAJESH KUMAR DESHMUKH/CLI/R</option>
+            <option value="RAJNEESH BENERJEE/CLI/BIA">RAJNEESH BENERJEE/CLI/BIA</option>
+            <option value="RANJEET SINGH/CLI/BYT">RANJEET SINGH/CLI/BYT</option>
+            <option value="RAKESH KUMAR KOSTA/CLI/DRZ">RAKESH KUMAR KOSTA/CLI/DRZ</option>
+            <option value="S K GAUTAM/CLI/BIA">S K GAUTAM/CLI/BIA</option>
+            <option value="S S HUSSAIN/CLI/BIA">S S HUSSAIN/CLI/BIA</option>
+            <option value="S. C. RAI/CLI/BIA">S. C. RAI/CLI/BIA</option>
+            <option value="S. K. SINGH/CLI/BIA">S. K. SINGH/CLI/BIA</option>
+            <option value="S. L. SONI/CLI/R">S. L. SONI/CLI/R</option>
+            <option value="SANJAY KUMAR ROY/CLI/BIA">SANJAY KUMAR ROY/CLI/BIA</option>
+            <option value="SANJAY SINGH/CLI/DRZ">SANJAY SINGH/CLI/DRZ</option>
+            <option value="SANJEEV KUMAR SHARMA/CLI/BIA">SANJEEV KUMAR SHARMA/CLI/BIA</option>
+            <option value="SANTOSH KUAMAR PATKAR/CLI/BIA">SANTOSH KUAMAR PATKAR/CLI/BIA</option>
+            <option value="SHAILENDRA SINGH/CLI/BIA">SHAILENDRA SINGH/CLI/BIA</option>
+            <option value="SUNDEEP KUMAR SHARMA/CLI/BIA">SUNDEEP KUMAR SHARMA/CLI/BIA</option>
+            <option value="SUNIL KUMAR DEWANGAN/CLI/BIA">SUNIL KUMAR DEWANGAN/CLI/BIA</option>
+            <option value="SURENDRA KUMAR SONI/CLI/BYT">SURENDRA KUMAR SONI/CLI/BYT</option>
+            <option value="SATYENDRA KUMAR/CLI/DRZ">SATYENDRA KUMAR/CLI/DRZ</option>
+            <option value="SANAT KUMAR SAHU/CLI/DRZ">SANAT KUMAR SAHU/CLI/DRZ</option>
+            <option value="TEST ID/CLI/BIA">TEST ID/CLI/BIA</option>
+            <option value="V.K. BHAGAT/CLI/R">V.K. BHAGAT/CLI/R</option>
+            <option value="VIJAY KUMAR ARYA/CLI/BIA">VIJAY KUMAR ARYA/CLI/BIA</option>
+            <option value="VIKAS SHENDE/CLI/R">VIKAS SHENDE/CLI/R</option>
+            <option value="VINAY KUMAR VINCHURE/CLI/BIA">VINAY KUMAR VINCHURE/CLI/BIA</option>
+            <option value="VINAY PANTAWANE/CLI/BIA">VINAY PANTAWANE/CLI/BIA</option>
+            <option value="Y. RAMU/CLI/BIA">Y. RAMU/CLI/BIA</option>
+            <option value="YOGESH KUMAR MIHAULIA/CLI/BIA">YOGESH KUMAR MIHAULIA/CLI/BIA</option>
+            <option value="OTHERS">OTHERS</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Handling Details -->
+    <div class="section">
+      <div class="section-title">Handling Details</div>
+      <div id="entriesWrap"></div>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn btn-blue" onclick="addRow()">＋ Add Entry</button>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-row">
+      <button class="btn btn-green" id="submitBtn" onclick="handleSubmit()">✔ Submit to Google Sheet</button>
+      <button class="btn btn-red" id="pdfBtn" onclick="generatePDF()">⬇ Generate PDF</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ── Google Apps Script Web App URL ──
+  // This single Apps Script handles BOTH trainee fetch AND form submission.
+  const SHEET_URL = ' https://script.google.com/macros/s/AKfycbygRjVKy8QjUbre-Np0oAETFq9y6FNqawYZbiJ6z5rSLu_V8ytWevvp_xnK25Ya7L6l/exec';
+
+  // ── Trainee Sheet details ──
+  const TRAINEE_SHEET_ID = '1Yn450uce02hgfbXJmRzd9aBY6bBEgaginXOctu--izg';
+  const SHEET_CSV_DIRECT = `https://docs.google.com/spreadsheets/d/${TRAINEE_SHEET_ID}/export?format=csv&gid=0`;
+
+  // CORS proxy list — tried in order until one works
+  const CORS_PROXIES = [
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://cors-anywhere.herokuapp.com/${url}`,
+  ];
+
+  // ── Trainee Data Store ──
+  let traineeData = {};
+
+  // ── Parse CSV (handles quoted fields with commas inside) ──
+  function parseCSV(text) {
+    const rows = [];
+    const lines = text.split(/\r?\n/);
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const row = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
+      }
+      row.push(cur.trim());
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  // ── Build dropdown from parsed CSV rows ──
+  function populateFromCSV(csvText, sel) {
+    const rows = parseCSV(csvText);
+    if (rows.length < 2) throw new Error('Sheet has no data rows');
+
+    const headers = rows[0].map(h => String(h).trim().toUpperCase());
+    const nameIdx  = headers.findIndex(h => h.includes('NAME'));
+    const desigIdx = headers.findIndex(h => h.includes('DESIG'));
+    const hqIdx    = headers.findIndex(h => h === 'HQ' || h.includes('H.Q') || h.includes('HEAD'));
+    const hrmsIdx  = headers.findIndex(h => h.includes('HRMS'));
+
+    if (nameIdx < 0) throw new Error('NAME column not found in sheet. Check headers.');
+
+    traineeData = {};
+    sel.innerHTML = '<option value="">-- Select Trainee Name --</option>';
+
+    // Collect all trainees first, then sort A-Z
+    const traineesTemp = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row  = rows[i];
+      const name = String(row[nameIdx] || '').trim().toUpperCase();
+      if (!name) continue;
+      traineesTemp.push({
+        name,
+        designation: desigIdx >= 0 ? String(row[desigIdx] || '').trim() : '',
+        hq:          hqIdx    >= 0 ? String(row[hqIdx]    || '').trim() : '',
+        hrms:        hrmsIdx  >= 0 ? String(row[hrmsIdx]  || '').trim() : '',
+      });
+    }
+
+    // Sort A-Z by name
+    traineesTemp.sort((a, b) => a.name.localeCompare(b.name));
+
+    traineesTemp.forEach(t => {
+      traineeData[t.name] = { designation: t.designation, hq: t.hq, hrms: t.hrms };
+      const opt = document.createElement('option');
+      opt.value = t.name; opt.textContent = t.name;
+      sel.appendChild(opt);
+    });
+
+    return traineesTemp.length;
+  }
+
+  // ── Build dropdown from Apps Script JSON response ──
+  function populateFromJSON(trainees, sel) {
+    traineeData = {};
+    sel.innerHTML = '<option value="">-- Select Trainee Name --</option>';
+
+    // Sort A-Z by name before populating
+    const sorted = [...trainees].sort((a, b) =>
+      String(a.name || '').trim().toUpperCase().localeCompare(String(b.name || '').trim().toUpperCase())
+    );
+
+    sorted.forEach(t => {
+      const name = String(t.name || '').trim().toUpperCase();
+      if (!name) return;
+      traineeData[name] = {
+        designation: String(t.designation || '').trim(),
+        hq:          String(t.hq          || '').trim(),
+        hrms:        String(t.hrms         || '').trim(),
+      };
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      sel.appendChild(opt);
+    });
+    return sorted.length;
+  }
+
+  async function loadTrainees() {
+    const sel = document.getElementById('traineeName');
+    sel.innerHTML = '<option value="">⏳ Fetching trainees...</option>';
+    sel.disabled = true;
+
+    const strategies = [
+      // 1️⃣ Apps Script endpoint (most reliable — already has CORS headers)
+      async () => {
+        const res = await fetch(SHEET_URL + '?action=getTrainees', { signal: AbortSignal.timeout(8000) });
+        const data = await res.json();
+        if (data.status !== 'success' || !data.trainees?.length) throw new Error(data.message || 'No trainees returned');
+        return { count: populateFromJSON(data.trainees, sel), label: 'Apps Script' };
+      },
+      // 2️⃣ Direct CSV (works if sheet is public)
+      async () => {
+        const res = await fetch(SHEET_CSV_DIRECT, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const csv = await res.text();
+        return { count: populateFromCSV(csv, sel), label: 'Google Sheets (direct)' };
+      },
+      // 3️⃣ CORS proxy — allorigins.win
+      async () => {
+        const url = CORS_PROXIES[0](SHEET_CSV_DIRECT);
+        const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+        if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
+        const csv = await res.text();
+        return { count: populateFromCSV(csv, sel), label: 'allorigins proxy' };
+      },
+      // 4️⃣ CORS proxy — corsproxy.io
+      async () => {
+        const url = CORS_PROXIES[1](SHEET_CSV_DIRECT);
+        const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+        if (!res.ok) throw new Error('Proxy2 HTTP ' + res.status);
+        const csv = await res.text();
+        return { count: populateFromCSV(csv, sel), label: 'corsproxy.io' };
+      },
+    ];
+
+    for (let i = 0; i < strategies.length; i++) {
+      try {
+        const { count, label } = await strategies[i]();
+        sel.disabled = false;
+        showToast(`✅ ${count} trainees loaded via ${label}!`, 'success');
+        const b = document.getElementById('fixBanner');
+        if (b) b.remove();
+        return; // success — stop trying
+      } catch (err) {
+        console.warn(`Strategy ${i + 1} failed:`, err.message);
+      }
+    }
+
+    // All strategies failed
+    sel.innerHTML = '<option value="">⚠️ Could not load trainees</option>';
+    sel.disabled = false;
+    showToast('❌ All fetch methods failed. See fix instructions below.', 'error');
+    showFixBanner();
+  }
+
+  function showFixBanner() {
+    if (document.getElementById('fixBanner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'fixBanner';
+    banner.style.cssText = 'background:#fff3cd;border:2px solid #ffc107;border-radius:8px;padding:14px 18px;margin:12px 0;font-size:12px;color:#856404;line-height:1.8;';
+    banner.innerHTML = `
+      <strong>⚠️ Could not fetch trainee data. Fix one of the following:</strong><br>
+      <b>Option A (Recommended):</b> In your Google Apps Script, redeploy with <i>Execute as: Me</i> and <i>Who has access: Anyone</i>.<br>
+      <b>Option B:</b> Open the Google Sheet → Share → <i>Anyone with the link → Viewer</i> → Save.<br>
+      <b>Then click 🔄 Refresh above.</b>
+    `;
+    document.querySelector('.form-container').prepend(banner);
+  }
+
+  function autoFillTrainee(name) {
+    const data  = traineeData[name] || {};
+    const desig = document.getElementById('designation');
+    const hq    = document.getElementById('hq');
+    const hrms  = document.getElementById('hrms');
+
+    desig.value = data.designation || '';
+    hq.value    = data.hq          || '';
+    hrms.value  = data.hrms        || '';
+
+    [desig, hq, hrms].forEach(el => {
+      if (el.value) {
+        el.setAttribute('readonly', true);
+        el.title = 'Auto-filled from Google Sheet';
+      } else {
+        el.removeAttribute('readonly');
+        el.title = '';
+      }
+    });
+
+    // Visual feedback
+    if (name) {
+      showToast('✅ Auto-filled: ' + name, 'success');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadTrainees);
+
+  let rowCount = 0;
+
+  function addRow() {
+    rowCount++;
+    const wrap = document.getElementById('entriesWrap');
+    const card = document.createElement('div');
+    card.className = 'entry-card';
+    card.setAttribute('data-entry', rowCount);
+    card.innerHTML = `
+      <div class="entry-card-head">
+        <span class="entry-num">Entry ${rowCount}</span>
+        <button class="delete-btn" onclick="this.closest('.entry-card').remove()">✕ Remove</button>
+      </div>
+      <div class="entry-card-body">
+        <div class="entry-grid">
+          <div class="entry-field"><label>Date</label><input type="date" name="date"></div>
+          <div class="entry-field"><label>Train No.</label><input type="text" name="trainNo"></div>
+          <div class="entry-field"><label>Loco No.</label><input type="text" name="locoNo"></div>
+          <div class="entry-field"><label>From Station</label><input type="text" name="fromStation"></div>
+          <div class="entry-field"><label>Dep. Time</label><input type="text" name="depTime"></div>
+          <div class="entry-field"><label>To Station</label><input type="text" name="toStation"></div>
+          <div class="entry-field"><label>Arr. Time</label><input type="text" name="arrTime"></div>
+          <div class="entry-field"><label>Footplate KM</label><input type="text" name="footplateKm"></div>
+          <div class="entry-field"><label>&nbsp;</label><input type="text" style="visibility:hidden"></div>
+          <div class="entry-field full"><label>Name &amp; Sign. of LP/ALP</label><textarea rows="2" name="lpAlpName"></textarea></div>
+          <div class="entry-field full"><label>Items Discussed During Handling</label><textarea rows="2" name="itemsDiscussed"></textarea></div>
+          <div class="entry-field full"><label>Name of CC/SM</label><textarea rows="2" name="ccSmName"></textarea></div>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(card);
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = type;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 4000);
+  }
+
+  function collectData() {
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const header = {
+      timestamp,
+      traineeName:  document.getElementById('traineeName').value,
+      designation:  document.getElementById('designation').value,
+      hq:           document.getElementById('hq').value,
+      hrms:         document.getElementById('hrms').value,
+      nominatedcli: document.getElementById('nominatedcli').value,
+    };
+    const entries = [];
+    document.querySelectorAll('.entry-card').forEach((card, i) => {
+      const get = name => { const el = card.querySelector(`[name="${name}"]`); return el ? el.value : ''; };
+      entries.push({
+        entryNo:        i + 1,
+        date:           get('date'),
+        trainNo:        get('trainNo'),
+        locoNo:         get('locoNo'),
+        fromStation:    get('fromStation'),
+        depTime:        get('depTime'),
+        toStation:      get('toStation'),
+        arrTime:        get('arrTime'),
+        footplateKm:    get('footplateKm'),
+        lpAlpName:      get('lpAlpName'),
+        itemsDiscussed: get('itemsDiscussed'),
+        ccSmName:       get('ccSmName'),
+      });
+    });
+    return { header, entries };
+  }
+
+  async function handleSubmit() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Submitting...';
+
+    const payload = collectData();
+
+    try {
+      const res = await fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      // no-cors returns opaque response, assume success if no network error
+      showToast('✅ Data submitted to Google Sheet!', 'success');
+    } catch (err) {
+      showToast('❌ Failed to connect. Check the Web App URL.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✔ Submit to Google Sheet';
+    }
+  }
+
+  function generatePDF() {
+    const btn = document.getElementById('pdfBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 10;
+
+      // ── Header ──
+      doc.setFillColor(26, 35, 126);
+      doc.rect(0, 0, pageW, 22, 'F');
+      doc.setFontSize(14);
+      doc.setTextColor(255, 215, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SOUTH EAST CENTRAL RAILWAY — RAIPUR DIVISION', pageW / 2, 8, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text('RRB ALP HANDLING REPORT', pageW / 2, 15, { align: 'center' });
+
+      // Timestamp
+      const ts = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+      doc.setFontSize(7);
+      doc.setTextColor(255, 215, 0);
+      doc.text('Generated: ' + ts, pageW - margin, 20, { align: 'right' });
+
+      let y = 28;
+
+      // ── Trainee Details ──
+      const td = collectData().header;
+      doc.setFillColor(57, 73, 171);
+      doc.rect(margin, y, pageW - margin * 2, 7, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TRAINEE DETAILS', pageW / 2, y + 5, { align: 'center' });
+      y += 10;
+
+      doc.setTextColor(26, 35, 126);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      const cols = [
+        ['Name of Trainee', td.traineeName],
+        ['Designation', td.designation],
+        ['HQ', td.hq],
+        ['HRMS ID', td.hrms],
+        ['Nominated CLI', td.nominatedcli],
+      ];
+      const colW = (pageW - margin * 2) / 3;
+      cols.forEach(([label, val], idx) => {
+        const cx = margin + (idx % 3) * colW;
+        const cy = y + Math.floor(idx / 3) * 10;
+        doc.setFont('helvetica', 'bold');
+        doc.text(label + ':', cx, cy);
+        doc.setFont('helvetica', 'normal');
+        doc.text((val || '').toUpperCase(), cx + 38, cy);
+      });
+      y += Math.ceil(cols.length / 3) * 10 + 4;
+
+      // ── Entries Table ──
+      doc.setFillColor(57, 73, 171);
+      doc.rect(margin, y, pageW - margin * 2, 7, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('HANDLING DETAILS', pageW / 2, y + 5, { align: 'center' });
+      y += 9;
+
+      const { entries } = collectData();
+      const tableHead = [['#', 'Date', 'Train No', 'Loco No', 'From', 'Dep', 'To', 'Arr', 'KM', 'LP/ALP Name & Sign.', 'Items Discussed', 'CC/SM Name']];
+      const tableBody = entries.map(e => [
+        e.entryNo, e.date, e.trainNo, e.locoNo, e.fromStation, e.depTime,
+        e.toStation, e.arrTime, e.footplateKm, e.lpAlpName, e.itemsDiscussed, e.ccSmName
+      ]);
+
+      doc.autoTable({
+        startY: y,
+        head: tableHead,
+        body: tableBody,
+        margin: { left: margin, right: margin },
+        styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak', textColor: [26, 35, 126] },
+        headStyles: { fillColor: [26, 35, 126], textColor: [255, 215, 0], fontStyle: 'bold', halign: 'center' },
+        alternateRowStyles: { fillColor: [240, 248, 255] },
+        columnStyles: {
+          0:  { cellWidth: 6,  halign: 'center' },
+          1:  { cellWidth: 18 },
+          2:  { cellWidth: 16 },
+          3:  { cellWidth: 16 },
+          4:  { cellWidth: 18 },
+          5:  { cellWidth: 12 },
+          6:  { cellWidth: 18 },
+          7:  { cellWidth: 12 },
+          8:  { cellWidth: 12 },
+          9:  { cellWidth: 38 },
+          10: { cellWidth: 55 },
+          11: { cellWidth: 38 },
+        },
+      });
+
+      // ── Footer ──
+      const pages = doc.internal.getNumberOfPages();
+      for (let p = 1; p <= pages; p++) {
+        doc.setPage(p);
+        doc.setFontSize(7);
+        doc.setTextColor(120, 120, 120);
+        doc.text('South East Central Railway — Raipur Division | RRB ALP Handling Report', margin, doc.internal.pageSize.getHeight() - 5);
+        doc.text(`Page ${p} of ${pages}`, pageW - margin, doc.internal.pageSize.getHeight() - 5, { align: 'right' });
+      }
+
+      const trainee = (td.traineeName || 'report').replace(/\s+/g, '_').toLowerCase();
+      doc.save(`ALP_Handling_Report_${trainee}_${new Date().toISOString().slice(0,10)}.pdf`);
+      showToast('✅ PDF generated and downloaded!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('❌ PDF generation failed. Check console.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '⬇ Generate PDF';
+    }
+  }
+
+  addRow();
+</script>
+
+<!--
+════════════════════════════════════════════════════════════════
+  GOOGLE APPS SCRIPT — REPLACE YOUR EXISTING SCRIPT WITH THIS
+════════════════════════════════════════════════════════════════
+
+1. Go to: https://script.google.com
+2. Open your existing project (or New Project)
+3. REPLACE ALL CODE with the following:
+
+─────────────────────────────────────────────────────────────
+
+var SUBMIT_SHEET_ID  = '1itfeMUmvvrIKt5F6lSsTsIi6os42DeO7Plnligiqfg4'; // Submission sheet
+var TRAINEE_SHEET_ID = '1Yn450uce02hgfbXJmRzd9aBY6bBEgaginXOctu--izg'; // Trainee master sheet
+
+function doGet(e) {
+  var action = e && e.parameter && e.parameter.action;
+  if (action === 'getTrainees') {
+    return getTrainees();
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify({status:'ok'}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getTrainees() {
+  try {
+    var ss    = SpreadsheetApp.openById(TRAINEE_SHEET_ID);
+    var sheet = ss.getSheets()[0];
+    var data  = sheet.getDataRange().getValues();
+    var headers = data[0].map(function(h){ return String(h).trim().toUpperCase(); });
+
+    var nameIdx  = headers.findIndex(function(h){ return h.includes('NAME'); });
+    var desigIdx = headers.findIndex(function(h){ return h.includes('DESIG'); });
+    var hqIdx    = headers.findIndex(function(h){ return h === 'HQ' || h.includes('H.Q') || h.includes('HEAD'); });
+    var hrmsIdx  = headers.findIndex(function(h){ return h.includes('HRMS'); });
+
+    var trainees = [];
+    for (var i = 1; i < data.length; i++) {
+      var row  = data[i];
+      var name = nameIdx >= 0 ? String(row[nameIdx] || '').trim() : '';
+      if (!name) continue;
+      trainees.push({
+        name:        name,
+        designation: desigIdx >= 0 ? String(row[desigIdx] || '').trim() : '',
+        hq:          hqIdx    >= 0 ? String(row[hqIdx]    || '').trim() : '',
+        hrms:        hrmsIdx  >= 0 ? String(row[hrmsIdx]  || '').trim() : ''
+      });
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'success', trainees: trainees}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'error', message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doPost(e) {
+  try {
+    var data    = JSON.parse(e.postData.contents);
+    var ss      = SpreadsheetApp.openById(SUBMIT_SHEET_ID);
+    var sheet   = ss.getSheets()[0];
+    var header  = data.header;
+    var entries = data.entries;
+
+    entries.forEach(function(entry) {
+      sheet.appendRow([
+        header.timestamp,
+        header.traineeName,
+        header.designation,
+        header.hq,
+        header.hrms,
+        header.nominatedcli,
+        entry.entryNo,
+        entry.date,
+        entry.trainNo,
+        entry.locoNo,
+        entry.fromStation,
+        entry.depTime,
+        entry.toStation,
+        entry.arrTime,
+        entry.footplateKm,
+        entry.lpAlpName,
+        entry.itemsDiscussed,
+        entry.ccSmName
+      ]);
+    });
+
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'success'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'error', message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+─────────────────────────────────────────────────────────────
+
+4. Click Deploy → Manage Deployments → Edit (pencil icon)
+   → Version: "New Version" → Deploy
+   (Keep the SAME Web App URL — no need to update the HTML)
+
+5. Your Trainee sheet (1Yn450uce02hgfbXJmRzd9aBY6bBEgaginXOctu--izg)
+   must have columns with headers: NAME | DESIGNATION | HQ | HRMS ID
+   (Row 1 = headers, Row 2 onwards = data)
+
+SUBMIT SHEET COLUMN ORDER:
+A: Timestamp | B: Trainee Name | C: Designation | D: HQ | E: HRMS ID | F: Nominated CLI
+G: Entry No | H: Date | I: Train No | J: Loco No | K: From Station | L: Dep Time
+M: To Station | N: Arr Time | O: Footplate KM | P: LP/ALP Name & Sign
+Q: Items Discussed | R: CC/SM Name
+════════════════════════════════════════════════════════════════
+-->
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
