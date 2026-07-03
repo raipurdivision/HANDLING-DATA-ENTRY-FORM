@@ -4,6 +4,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +32,18 @@
       background:linear-gradient(135deg,#1a237e 0%,#283593 100%);
       color:#fff; border-bottom:4px solid #FFD700;
       padding:12px 18px;
+      position:relative;
     }
+    .open-dashboard-btn{
+      position:absolute; bottom:6px; right:14px;
+      background:#FFD700; color:#1a237e;
+      font-size:11px; font-weight:bold; letter-spacing:.5px;
+      padding:6px 12px; border-radius:6px;
+      border:1px solid #c9a800; text-decoration:none;
+      box-shadow:0 2px 4px rgba(0,0,0,.25);
+      z-index:2;
+    }
+    .open-dashboard-btn:hover{background:#e6c200;}
     .header-inner{display:flex;align-items:center;gap:14px;}
     .logo-circle{
       width:64px;height:64px;border-radius:50%;
@@ -124,6 +137,7 @@
 <div class="container">
 
   <div class="header">
+    <a class="open-dashboard-btn" href="https://raipurdivision.github.io/HANDLING-DASHBOARD/" target="_blank">OPEN DASHBOARD</a>
     <div class="header-inner">
    
       <div class="header-text">
@@ -495,9 +509,9 @@
           <div class="entry-field"><label>Arr. Time</label><input type="text" name="arrTime"></div>
           <div class="entry-field"><label>Footplate KM</label><input type="text" name="footplateKm"></div>
           <div class="entry-field"><label>&nbsp;</label><input type="text" style="visibility:hidden"></div>
-          <div class="entry-field full"><label>Name &amp; Sign. of LP/ALP</label><textarea rows="2" name="lpAlpName"></textarea></div>
-          <div class="entry-field full"><label>Items Discussed During Handling</label><textarea rows="2" name="itemsDiscussed"></textarea></div>
-          <div class="entry-field full"><label>Name of CC/SM</label><textarea rows="2" name="ccSmName"></textarea></div>
+          <div class="entry-field full"><label>Working LP Name/HQ/CMS ID</label><textarea rows="2" name="lpAlpName"></textarea></div>
+          <div class="entry-field full"><label>Remarks if any</label><textarea rows="2" name="itemsDiscussed"></textarea></div>
+          <div class="entry-field full" style="display:none;"><label style="display:none;">Name of CC/SM</label><textarea rows="2" name="ccSmName"></textarea></div>
         </div>
       </div>
     `;
