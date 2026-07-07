@@ -6,6 +6,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,7 +142,7 @@
     <div class="header-inner">
    
       <div class="header-text">
-        <div class="hindi">RRB ALP 34 DAYS HANDLING DATA FORM</div>
+        <div class="hindi">LR / HANDLING DATA FORM</div>
         <div class="sub">South East Central Railway</div>
         <div class="sub2">Raipur Division</div>
       </div>
@@ -177,7 +178,7 @@
           <input type="text" id="hrms">
         </div>
         <div class="field-pair">
-          <label>Nominated CLI</label>
+          <label>Nominated CLI <span style="color:#e74c3c;">*</span></label>
           <select id="nominatedcli">
             <option value="">-- Select CLI --</option>
             <option value="A K REDDY/CLI/BIA">A K REDDY/CLI/BIA</option>
@@ -198,7 +199,7 @@
             <option value="BHOLI CHAUDHARY/CLI/R">BHOLI CHAUDHARY/CLI/R</option>
             <option value="BIKRAMJIT KANRAR/CLI/BIA">BIKRAMJIT KANRAR/CLI/BIA</option>
             <option value="BINOD KUMAR RAM/CLI/R">BINOD KUMAR RAM/CLI/R</option>
-            <option value="RAJENDRA SINGH/CLI/BIA">RAJENDRA SINGH/CLI/BIA</option>
+            <option value="CLI NAME/CLI/BIA">CLI NAME/CLI/BIA</option>
             <option value="DEEPANNITA PUNTAMBEKAR/CLI/BIA">DEEPANNITA PUNTAMBEKAR/CLI/BIA</option>
             <option value="DILLI RAO/CLI/BYT">DILLI RAO/CLI/BYT</option>
             <option value="G. C. BISWAS/CLI/R">G. C. BISWAS/CLI/R</option>
@@ -212,7 +213,7 @@
             <option value="KHUSHAL SINGH/CLI/DRZ">KHUSHAL SINGH/CLI/DRZ</option>
             <option value="KAMLESH KUMAR RAJABHOJ/CLI/BIA">KAMLESH KUMAR RAJABHOJ/CLI/BIA</option>
             <option value="MAHESHWAR/CLI/BIA">MAHESHWAR/CLI/BIA</option>
-            <option value="MANOJ KUMAR SAO/CLI/BIA">MANOJ KUMAR SAO/CLI/BIA</option>
+            <option value="MANOJ KUMAR SAO/CLI/R">MANOJ KUMAR SAO/CLI/R</option>
             <option value="MANSUKH LAL CHANDRAKAR/CLI/R">MANSUKH LAL CHANDRAKAR/CLI/R</option>
             <option value="MOHIT KUMAR SWARNKAR/CLI/BIA">MOHIT KUMAR SWARNKAR/CLI/BIA</option>
             <option value="N. R. KARPAL/CLI/BIA">N. R. KARPAL/CLI/BIA</option>
@@ -275,6 +276,16 @@
 
   </div>
 </div>
+
+<datalist id="stationList">
+  <option value="BSP">
+  <option value="DGG">
+  <option value="H CABIN">
+  <option value="G CABIN">
+  <option value="DURG">
+  <option value="KRBA">
+  <option value="MXA">
+</datalist>
 
 <div id="toast"></div>
 
@@ -503,9 +514,9 @@
           <div class="entry-field"><label>Date</label><input type="date" name="date"></div>
           <div class="entry-field"><label>Train No.</label><input type="text" name="trainNo"></div>
           <div class="entry-field"><label>Loco No.</label><input type="text" name="locoNo"></div>
-          <div class="entry-field"><label>From Station</label><input type="text" name="fromStation"></div>
+          <div class="entry-field"><label>From Station</label><input type="text" name="fromStation" list="stationList" autocomplete="off"></div>
           <div class="entry-field"><label>Dep. Time</label><input type="text" name="depTime"></div>
-          <div class="entry-field"><label>To Station</label><input type="text" name="toStation"></div>
+          <div class="entry-field"><label>To Station</label><input type="text" name="toStation" list="stationList" autocomplete="off"></div>
           <div class="entry-field"><label>Arr. Time</label><input type="text" name="arrTime"></div>
           <div class="entry-field"><label>Footplate KM</label><input type="text" name="footplateKm"></div>
           <div class="entry-field"><label>&nbsp;</label><input type="text" style="visibility:hidden"></div>
@@ -562,6 +573,13 @@
   async function handleSubmit() {
     if (isSubmitted) {
       alert('⚠️ DATA ALREADY SUBMITTED');
+      return;
+    }
+
+    const cliVal = document.getElementById('nominatedcli').value;
+    if (!cliVal) {
+      showToast('❌ NOMINATED CLI IS MANDATORY. PLEASE SELECT A CLI.', 'error');
+      document.getElementById('nominatedcli').focus();
       return;
     }
 
